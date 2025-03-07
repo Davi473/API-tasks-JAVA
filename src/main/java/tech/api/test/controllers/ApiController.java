@@ -13,60 +13,41 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import tech.api.test.dto.TaskDTO;
-import tech.api.test.useCase.DeleteTask;
-import tech.api.test.useCase.GetTask;
-import tech.api.test.useCase.GetTaskID;
-import tech.api.test.useCase.SaveTask;
-
+import tech.api.test.service.TaskService;
 
 @RestController()
 @RequestMapping("/task")
 public class ApiController {
     @Autowired
-    private GetTask getTask;
-
-    @Autowired
-    private SaveTask saveTask;
-
-    @Autowired
-    private GetTaskID getTaskID;
-
-    @Autowired
-    private DeleteTask deleteTask;
+    private TaskService taskService;
 
     ApiController (
-        GetTask getTask,
-        SaveTask saveTask,
-        GetTaskID getTaskID,
-        DeleteTask deleteTask
+        TaskService taskService
     ) {
-        this.getTask = getTask;
-        this.saveTask = saveTask;
-        this.getTaskID = getTaskID;
-        this.deleteTask = deleteTask;
+        this.taskService = taskService;
     }  
 
     @GetMapping()
     public ResponseEntity<Object> getTask() {
-        List<Object> tasks = this.getTask.execute();
+        List<Object> tasks = this.taskService.get();
         return ResponseEntity.ok(tasks);
     }
 
     @PostMapping()
     public ResponseEntity<String> addTask(@RequestBody TaskDTO task) {
-        saveTask.execute(task);
+        this.taskService.save(task);
         return ResponseEntity.ok("Created task with sucess");
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getTaskID(@PathVariable String id) {
-        Object tasks = this.getTaskID.execute(id);
+        Object tasks = this.taskService.getById(id);
         return ResponseEntity.ok(tasks);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteTask(@PathVariable String id) {
-        deleteTask.execute(id);
+        this.taskService.delete(id);
         return ResponseEntity.ok("Deleted task with sucess");
     }
 }
